@@ -1,34 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { GoogleSpreadsheet } from "google-spreadsheet";
 
-function App() {
-  const [count, setCount] = useState(0)
+// Config variables
+const SPREADSHEET_ID = import.meta.env.VITE_APP_SPREADSHEET_ID;
+const SHEET_ID = import.meta.env.VITE_APP_SHEET_ID;
+const CLIENT_EMAIL = import.meta.env.VITE_APP_GOOGLE_CLIENT_EMAIL;
+const PRIVATE_KEY = import.meta.env.VITE_APP_GOOGLE_SERVICE_PRIVATE_KEY;
 
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
-}
+const decoded = atob(PRIVATE_KEY);
 
-export default App
+const getSpreadsheetData = async () => {
+  const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
+
+  await doc.useServiceAccountAuth({
+    client_email: CLIENT_EMAIL,
+    private_key: decoded,
+  });
+
+  await doc.loadInfo();
+
+  const sheet = doc.sheetsById[SHEET_ID];
+  const rows = await sheet.getRows();
+
+  console.log(sheet);
+  console.log(rows);
+};
+
+getSpreadsheetData();
+
+export const App = () => {
+  return <div>APP</div>;
+};
